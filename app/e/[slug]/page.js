@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import RegistrationForm from "@/components/registrations/registration-form";
 import { getPublicEvent } from "@/lib/events/server";
 
 export async function generateMetadata({ params }) {
@@ -39,8 +40,7 @@ export default async function PublicEventPage({ params }) {
           <div><span className="workspace-overline">WHEN</span><p>{eventDate}</p></div>
           <div><span className="workspace-overline">WHERE</span><p>{event.event_type === "online" ? "Online" : event.venue_name}{event.venue_address ? <><br />{event.venue_address}</> : null}</p>{event.online_url && <a href={event.online_url} rel="noreferrer" target="_blank">Event link <span aria-hidden="true">&#8599;</span></a>}</div>
           {event.tickets.length > 0 && <div className="public-ticket-list"><span className="workspace-overline">TICKETS</span>{event.tickets.map((ticket) => <p key={ticket.name}>{ticket.name}<strong>{ticket.currency} {(ticket.price_minor / 100).toFixed(2)}</strong></p>)}</div>}
-          <button className="button button-dark public-register-button" disabled type="button">Registration opens next</button>
-          <p className="registration-note">This event page is live. Online registration is coming in the next build step.</p>
+          <RegistrationForm registrationMode={event.registration_mode} slug={event.slug} />
         </aside>
       </div>
     </main>

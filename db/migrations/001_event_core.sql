@@ -57,3 +57,46 @@ CREATE TABLE IF NOT EXISTS event_questions (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE (event_id, field_key)
 );
+
+CREATE TABLE IF NOT EXISTS registrations (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  event_id TEXT NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+  user_id TEXT REFERENCES "user"(id) ON DELETE SET NULL,
+  email TEXT NOT NULL,
+  full_name TEXT NOT NULL,
+  phone TEXT,
+  status TEXT NOT NULL DEFAULT 'confirmed' CHECK (status IN ('confirmed', 'cancelled', 'waitlisted')),
+  source TEXT NOT NULL DEFAULT 'public',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE (event_id, email)
+);
+
+CREATE INDEX IF NOT EXISTS registrations_event_created_idx ON registrations(event_id, created_at);
+CREATE INDEX IF NOT EXISTS registrations_event_status_idx ON registrations(event_id, status);
+
+CREATE TABLE IF NOT EXISTS tickets (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  event_id TEXT NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+  registration_id TEXT NOT NULL REFERENCES registrations(id) ON DELETE CASCADE,
+  ticket_number TEXT NOT NULL UNIQUE,
+  qr_token_hash TEXT NOT NULL UNIQUE,
+  status TEXT NOT NULL DEFAULT 'issued' CHECK (status IN ('issued', 'cancelled', 'used')),
+  issued_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  cancelled_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS tickets_event_status_idx ON tickets(event_id, status);
+CREATE INDEX IF NOT EXISTS tickets_registration_idx ON tickets(registration_id);
+
+CREATE TABLE IF NOT EXISTS checkins (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  event_id TEXT NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+  ticket_id TEXT NOT NULL REFERENCES tickets(id) ON DELETE CASCADE,
+  checked_in_by TEXT NOT NULL REFERENCES "user"(id) ON DELETE RESTRICT,
+  checked_in_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  method TEXT NOT NULL DEFAULT 'manual' CHECK (method IN ('manual', 'qr')),
+  UNIQUE (ticket_id)
+);
+
+CREATE INDEX IF NOT EXISTS checkins_event_time_idx ON checkins(event_id, checked_in_at);

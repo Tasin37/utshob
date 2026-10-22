@@ -55,7 +55,7 @@ The organizer account and event flows require a PostgreSQL database and Better A
 
 1. Copy `.env.example` to `.env.local` and set `DATABASE_URL` to the Supabase PostgreSQL connection string.
 2. Generate a secret of at least 32 characters for `BETTER_AUTH_SECRET` and set `BETTER_AUTH_URL` to the local or deployed app URL.
-3. Set `EMAIL_PROVIDER=resend`, `EMAIL_API_KEY`, and `EMAIL_FROM` to enable password reset and team invitations. Email delivery is optional for signup/sign-in. For local testing without a domain, Resend's `onboarding@resend.dev` sender can deliver only to the email associated with your Resend account.
+3. Set `EMAIL_PROVIDER=resend`, `EMAIL_API_KEY`, and `EMAIL_FROM` to enable password reset emails. Team invitations are delivered inside the Team screen and do not send email. Email delivery is optional for signup/sign-in.
 4. Apply the Better Auth tables with `npx auth@latest migrate --config ./lib/auth/config.js`.
 5. Apply `db/migrations/001_event_core.sql` to the same database using the Supabase SQL editor or `psql`.
 

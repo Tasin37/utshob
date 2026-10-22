@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { authClient } from "@/lib/auth/client";
 
@@ -9,10 +10,12 @@ function rowsFrom(result, key) {
   return result?.data?.[key] || result?.data?.items || [];
 }
 
-export default function TeamManager({ organizations }) {
+export default function TeamManager({ incomingInvitations: initialIncomingInvitations = [], organizations }) {
+  const router = useRouter();
   const [organizationId, setOrganizationId] = useState(organizations[0]?.id || "");
   const [members, setMembers] = useState([]);
   const [invitations, setInvitations] = useState([]);
+  const [incomingInvitations, setIncomingInvitations] = useState(initialIncomingInvitations);
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("member");
   const [loading, setLoading] = useState(Boolean(organizationId));
@@ -92,6 +95,19 @@ export default function TeamManager({ organizations }) {
     setInvitations((current) => current.filter((invitation) => invitation.id !== invitationId));
   }
 
+  async function respondToInvitation(invitationId, action) {
+    setError("");
+    const result = action === "accept"
+      ? await authClient.organization.acceptInvitation({ invitationId })
+      : await authClient.organization.rejectInvitation({ invitationId });
+    if (result.error) {
+      setError(result.error.message);
+      return;
+    }
+    setIncomingInvitations((current) => current.filter((invitation) => invitation.id !== invitationId));
+    if (action === "accept") router.refresh();
+  }
+
   if (!organizations.length) {
     return <section className="dashboard-empty"><h2>Create an organization first.</h2><p>Your team belongs to an organization workspace.</p></section>;
   }
@@ -125,6 +141,22 @@ export default function TeamManager({ organizations }) {
 
       {error && <p className="form-message form-error" role="alert">{error}</p>}
       {notice && <p className="form-message form-success" role="status">{notice}</p>}
+
+      {incomingInvitations.length > 0 && (
+        <section className="team-section incoming-invitations" aria-labelledby="incoming-invitations-heading">
+          <div className="dashboard-section-heading"><div><span className="workspace-overline">YOU HAVE BEEN INVITED</span><h2 id="incoming-invitations-heading">Incoming invitations</h2></div><span className="table-count">{incomingInvitations.length}</span></div>
+          <div className="member-list">
+            {incomingInvitations.map((invitation) => (
+              <div className="member-row" key={invitation.id}>
+                <span className="member-avatar invitation-avatar" aria-hidden="true">&#8599;</span>
+                <span className="member-identity"><strong>{invitation.organization?.name || "Organization invitation"}</strong><small>Invited as {invitation.role}</small></span>
+                <button className="quiet-button invitation-reject" onClick={() => respondToInvitation(invitation.id, "reject")} type="button">Reject</button>
+                <button className="button button-dark invitation-accept" onClick={() => respondToInvitation(invitation.id, "accept")} type="button">Accept <span aria-hidden="true">&#8599;</span></button>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="team-section" aria-labelledby="members-heading">
         <div className="dashboard-section-heading"><div><span className="workspace-overline">THE PEOPLE</span><h2 id="members-heading">Members</h2></div><span className="table-count">{members.length}</span></div>

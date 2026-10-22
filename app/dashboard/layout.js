@@ -6,6 +6,9 @@ import { getServerSession } from "@/lib/auth/session";
 const navigation = [
   { label: "Overview", href: "/dashboard" },
   { label: "Events", href: "/dashboard/events" },
+  { label: "Attendees", href: "/dashboard/attendees" },
+  { label: "Check-in", href: "/dashboard/check-in" },
+  { label: "Analytics", href: "/dashboard/analytics" },
   { label: "Team", href: "/dashboard/team" },
 ];
 

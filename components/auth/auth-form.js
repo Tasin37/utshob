@@ -54,6 +54,8 @@ export default function AuthForm({ mode, backendReady, missing = [], token = "",
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const page = copy[mode];
 
   async function handleSubmit(event) {
@@ -170,20 +172,42 @@ export default function AuthForm({ mode, backendReady, missing = [], token = "",
             {mode !== "forgot-password" && (
               <label>
                 {mode === "reset-password" ? "New password" : "Password"}
-                <input
-                  autoComplete={mode === "sign-up" ? "new-password" : "current-password"}
-                  minLength={8}
-                  onChange={(event) => setPassword(event.target.value)}
-                  required
-                  type="password"
-                  value={password}
-                />
+                <span className="password-input-wrap">
+                  <input
+                    autoComplete={mode === "sign-up" ? "new-password" : "current-password"}
+                    minLength={8}
+                    onChange={(event) => setPassword(event.target.value)}
+                    required
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                  />
+                  <button
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    className="password-toggle"
+                    onClick={() => setShowPassword((visible) => !visible)}
+                    title={showPassword ? "Hide password" : "Show password"}
+                    type="button"
+                  >
+                    {showPassword ? "Hide" : "Show"}
+                  </button>
+                </span>
               </label>
             )}
             {mode === "reset-password" && (
               <label>
                 Confirm new password
-                <input autoComplete="new-password" minLength={8} onChange={(event) => setConfirmPassword(event.target.value)} required type="password" value={confirmPassword} />
+                <span className="password-input-wrap">
+                  <input autoComplete="new-password" minLength={8} onChange={(event) => setConfirmPassword(event.target.value)} required type={showConfirmPassword ? "text" : "password"} value={confirmPassword} />
+                  <button
+                    aria-label={showConfirmPassword ? "Hide confirmed password" : "Show confirmed password"}
+                    className="password-toggle"
+                    onClick={() => setShowConfirmPassword((visible) => !visible)}
+                    title={showConfirmPassword ? "Hide confirmed password" : "Show confirmed password"}
+                    type="button"
+                  >
+                    {showConfirmPassword ? "Hide" : "Show"}
+                  </button>
+                </span>
               </label>
             )}
             {mode === "sign-in" && <Link className="forgot-link" href="/forgot-password">Forgot password?</Link>}

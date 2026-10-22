@@ -1,10 +1,13 @@
 import TeamManager from "@/components/organizations/team-manager";
-import { getUserOrganizations } from "@/lib/auth/session";
+import { getUserInvitations, getUserOrganizations } from "@/lib/auth/session";
 
 export const metadata = { title: "Organization team | Utshob" };
 
 export default async function TeamPage() {
-  const organizations = await getUserOrganizations();
+  const [organizations, incomingInvitations] = await Promise.all([
+    getUserOrganizations(),
+    getUserInvitations(),
+  ]);
 
   return (
     <main className="dashboard-main">
@@ -14,7 +17,7 @@ export default async function TeamPage() {
           <h1>Your <em>team.</em></h1>
         </div>
       </div>
-      <TeamManager organizations={organizations.map((organization) => ({
+      <TeamManager incomingInvitations={incomingInvitations || []} organizations={organizations.map((organization) => ({
         id: organization.id,
         name: organization.name,
         role: organization.member?.role || "member",
