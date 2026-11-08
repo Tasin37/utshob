@@ -15,7 +15,7 @@ Official/product references consulted:
 - Eventbrite organizer features: https://www.eventbrite.com/organizer/features/all-features/
 - Cvent features: https://www.cvent.com/en/event-management-software/features
 - Partiful: https://partiful.com/
-- OpenAI function calling: https://developers.openai.com/api/docs/guides/function-calling
-- OpenAI structured outputs: https://developers.openai.com/api/docs/guides/structured-outputs
+- Google Gemini API: https://ai.google.dev/gemini-api/docs
+- Gemini structured outputs: https://ai.google.dev/gemini-api/docs/structured-output
 
 These references are starting points; re-check vendor documentation before implementing provider-specific code because APIs and package versions change.

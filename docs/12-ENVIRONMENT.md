@@ -21,10 +21,9 @@ SUPABASE_SERVICE_ROLE_KEY=
 # Database / Better Auth PostgreSQL
 DATABASE_URL=
 
-# AI
-AI_PROVIDER=
-AI_API_KEY=
-AI_MODEL=
+# AI - Google AI Studio free tier (server-only)
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-3.8-flash
 
 # Email
 EMAIL_PROVIDER=
@@ -58,6 +57,22 @@ The organizer account and event flows require a PostgreSQL database and Better A
 3. Set `EMAIL_PROVIDER=resend`, `EMAIL_API_KEY`, and `EMAIL_FROM` to enable password reset emails. Team invitations are delivered inside the Team screen and do not send email. Email delivery is optional for signup/sign-in.
 4. Apply the Better Auth tables with `npx auth@latest migrate --config ./lib/auth/config.js`.
 5. Apply `db/migrations/001_event_core.sql` to the same database using the Supabase SQL editor or `psql`.
+6. Apply `db/migrations/002_payments.sql` and `db/migrations/003_payment_completion.sql` in order.
+7. Apply `db/migrations/004_ai_audit.sql` for the Phase 6 AI audit log.
+8. Apply `db/migrations/005_event_faqs.sql` for reviewed event FAQs.
+9. Apply `db/migrations/006_ai_audit_event.sql` for event-scoped assistant audit records.
+10. Apply `db/migrations/007_promo_codes.sql` for promo codes and discounted orders.
+11. Apply `db/migrations/008_event_recurrence.sql` for recurring event settings.
+12. Apply `db/migrations/009_event_waitlists.sql` for RSVP waitlist support.
+13. Apply `db/migrations/010_event_speakers.sql` for event speaker profiles.
+14. Apply `db/migrations/011_event_sponsors.sql` for event sponsor profiles.
+15. Apply `db/migrations/012_event_exhibitors.sql` for event exhibitor profiles.
+16. Apply `db/migrations/013_webhooks.sql` for organization webhook endpoints and delivery records.
+8. Set `BKASH_MERCHANT_NUMBER` for manual bKash checkout. It defaults to `01319059266`.
+9. Create a Google AI Studio API key and set `GEMINI_API_KEY` on the server to enable the event draft generator. `GEMINI_MODEL` defaults to `gemini-3.8-flash`. Google may apply free-tier quotas and rate limits.
+10. Set `WEBHOOK_ENCRYPTION_KEY` to a long random server-only secret before enabling webhook delivery.
+
+Paid checkout currently uses bKash Send Money. The attendee submits the bKash transaction ID after payment, and the order is confirmed with a ticket.
 
 Never use production credentials for local development. The app reports missing auth/database settings on account pages and does not create local-only accounts.
 

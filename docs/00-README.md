@@ -8,7 +8,7 @@ Utshob is a full-stack event organizer and event discovery platform.
 - Supabase PostgreSQL + Storage
 - Better Auth
 - Vercel
-- AI provider abstraction; OpenAI-compatible implementation recommended
+- AI provider abstraction; Google Gemini free-tier implementation
 - Optional payment/email/SMS/map providers behind adapters
 
 ## Documentation map

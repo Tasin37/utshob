@@ -28,6 +28,8 @@ ai.generateEventDraft(input)
 ai.answerOrganizerQuestion(context)
 ```
 
+The current assistant uses the explicit read-only `get_event_analytics` tool in `lib/ai/tools.mjs`. The tool performs authorization through the server analytics service before any data is placed in the model context.
+
 It should not directly call a vendor SDK.
 
 ## 3. Structured outputs
@@ -71,7 +73,7 @@ Future tools:
 - draft_refund
 - draft_ticket_change
 
-Use strict schemas for tool arguments and validate again on the server. OpenAI's function-calling guidance recommends strict mode for reliable schema adherence. citeturn2search0
+Use strict schemas for tool arguments and validate again on the server. The Gemini response schema is an output constraint; server-side validation remains required.
 
 ## 5. Authorization
 Every tool must accept an authenticated context.
@@ -164,6 +166,8 @@ Metrics:
 - latency
 - cost/request
 
+The initial local evaluation suite lives in `tests/ai-evaluation.test.mjs`. It intentionally avoids live provider calls so CI remains deterministic and free-tier quotas are not consumed.
+
 ## 12. Suggested AI UX
 Never show a blank chatbot only.
 
@@ -175,5 +179,7 @@ Provide actions:
 - Analyze registrations
 - Explain attendance
 - Draft announcement
+
+The advanced AI announcement drafter is available to authorized event organizers. It uses the existing read-only analytics tool, returns structured subject/body/audience-note content, records an audit entry, and never sends messages automatically.
 
 This makes AI discoverable and constrained.
