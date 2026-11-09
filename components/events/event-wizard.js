@@ -76,6 +76,7 @@ export default function EventWizard({ draftId, organizations }) {
   const [faqs, setFaqs] = useState([]);
   const [faqPending, setFaqPending] = useState(false);
   const [faqError, setFaqError] = useState("");
+  const [coverImageError, setCoverImageError] = useState("");
 
   useEffect(() => {
     if (!draftId) return undefined;
@@ -156,6 +157,39 @@ export default function EventWizard({ draftId, organizations }) {
 
   function updateRecurrence(field, value) {
     setDraft((current) => ({ ...current, recurrence: { ...current.recurrence, [field]: value } }));
+  }
+
+  function uploadCoverImage(event) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    setCoverImageError("");
+    if (!file.type.startsWith("image/")) {
+      setCoverImageError("Choose an image file.");
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      setCoverImageError("Choose an image smaller than 8 MB.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const image = new Image();
+      image.onload = () => {
+        const maxDimension = 1600;
+        const scale = Math.min(1, maxDimension / Math.max(image.width, image.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(image.width * scale));
+        canvas.height = Math.max(1, Math.round(image.height * scale));
+        canvas.getContext("2d").drawImage(image, 0, 0, canvas.width, canvas.height);
+        updateField("coverImageUrl", canvas.toDataURL("image/jpeg", 0.82));
+      };
+      image.onerror = () => setCoverImageError("That image could not be read. Choose another file.");
+      image.src = reader.result;
+    };
+    reader.onerror = () => setCoverImageError("That image could not be read. Choose another file.");
+    reader.readAsDataURL(file);
   }
 
   async function generateAiDraft(event) {
@@ -390,8 +424,16 @@ export default function EventWizard({ draftId, organizations }) {
             </div>}
 
             {step === 4 && <div className="wizard-fields">
-              <label className="field-wide">Cover image URL<input onChange={(event) => updateField("coverImageUrl", event.target.value)} placeholder="https://your-image.jpg" type="url" value={draft.coverImageUrl} /></label>
-              <p className="field-note field-wide">Image uploads will be connected to Utshob storage in a later step. For now, use a public image URL or leave this blank.</p>
+              <label className="field-wide">Cover image URL<input onChange={(event) => { setCoverImageError(""); updateField("coverImageUrl", event.target.value); }} placeholder="https://your-image.jpg" type="url" value={draft.coverImageUrl.startsWith("data:") ? "" : draft.coverImageUrl} /></label>
+              <div className="cover-upload field-wide">
+                <label className="cover-upload-button">
+                  <input accept="image/*" onChange={uploadCoverImage} type="file" />
+                  <span aria-hidden="true">↑</span> Upload an image
+                </label>
+                <span>JPG, PNG, GIF or WebP · up to 8 MB</span>
+              </div>
+              {coverImageError && <p className="ai-error field-wide" role="alert">{coverImageError}</p>}
+              <p className="field-note field-wide">Upload an image from your device, or paste a public image URL above. Your selected image is resized for the event cover.</p>
               {draft.coverImageUrl && <div className="cover-preview" role="img" aria-label="Event cover image preview" style={{ backgroundImage: `url("${draft.coverImageUrl}")` }} />}
             </div>}
 

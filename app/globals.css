@@ -2839,6 +2839,49 @@ input {
   background-size: cover;
 }
 
+.cover-upload {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.cover-upload-button {
+  display: inline-flex !important;
+  min-height: 42px;
+  align-items: center;
+  gap: 8px !important;
+  padding: 0 15px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--foreground) !important;
+  cursor: pointer;
+  font-size: 11px !important;
+  font-weight: 750 !important;
+  transition: border-color 180ms ease, background 180ms ease;
+}
+
+.cover-upload-button:hover {
+  border-color: var(--tomato);
+  background: var(--paper);
+}
+
+.cover-upload-button span {
+  color: var(--tomato);
+  font-size: 18px;
+}
+
+.cover-upload-button input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
 .event-preview {
   display: grid;
   grid-template-columns: 1.1fr .9fr;
