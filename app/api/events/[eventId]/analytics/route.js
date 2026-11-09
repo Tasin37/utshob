@@ -14,7 +14,7 @@ export async function GET(request, { params }) {
     if (result.error) return Response.json({ error: { code: "ANALYTICS_FAILED", message: result.error } }, { status: result.status });
     return Response.json(result);
   } catch (error) {
-    console.error("Analytics query failed", error.code || error.name);
+    console.error("Analytics query failed", error.code || error.name, error.message);
     return Response.json({ error: { code: "ANALYTICS_UNAVAILABLE", message: "Analytics are temporarily unavailable." } }, { status: 503 });
   }
 }
